@@ -7,7 +7,13 @@ struct Song
 {
     std::string title;
     std::string filePath;
+    size_t year;
 };
+
+bool operator<(const Song& lhs, const Song& rhs)
+{
+    return lhs.year < rhs.year;
+}
 
 class DynamicPlaylist
 {
@@ -25,7 +31,7 @@ public:
 
     const Song& currentTrack() const
     {
-        return m_songs.front();
+        return m_songs.top(); // not front, but top()
     }
 
     auto size() /*-> decltype (m_songs)::size_type     - WOW! C++14 auto function return type deduction */
@@ -34,16 +40,16 @@ public:
     }
 
 private:
-    std::queue<Song> m_songs;
+    std::priority_queue<Song> m_songs;
 };
 
 std::vector<Song> scanFiles()
 {
     std::vector<Song> data {
-        {"Night Witches", "Sabaton/NightWitches.mp3"},
-        {"Resist and Bite", "Sabaton/ResistAndBite.mp3"},
-        {"Ghost Division", "Sabaton/GhostDivision.mp3"},
-        {"Primo Victoria", "Sabaton/PrimoVictoria.mp3"}
+        {"Night Witches", "Sabaton/NightWitches.mp3", 2010},
+        {"Resist and Bite", "Sabaton/ResistAndBite.mp3", 2012},
+        {"Ghost Division", "Sabaton/GhostDivision.mp3", 2011},
+        {"Primo Victoria", "Sabaton/PrimoVictoria.mp3", 2008}
     };
     std::string devicePath {"/run/media/sda1/"}; // flash drive mount point
     std::for_each(data.begin(), data.end(), [&](Song& song) {
@@ -68,6 +74,11 @@ void insestigateConstructors() {
 
     std::deque<std::string> someData {"1", "2", "3"};
     std::queue<std::string> someQueue {someData}; // we can initialize with a copy of already created data
+
+    auto comparator = [](const std::string& lhs, const std::string& rhs) {
+            return lhs < rhs;
+        };
+    std::priority_queue<std::string, std::vector<std::string>, decltype (comparator)> somePriorityQueue {comparator};
 }
 
 int main()
